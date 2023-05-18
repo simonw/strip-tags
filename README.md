@@ -7,6 +7,8 @@
 
 Strip tags from HTML, optionally from areas identified by CSS selectors
 
+See [llm, ttok and strip-tags—CLI tools for working with ChatGPT and other LLMs](https://simonwillison.net/2023/May/18/cli-tools-for-llms/) for more on this project.
+
 ## Installation
 
 Install this tool using `pip`:
