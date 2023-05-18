@@ -51,10 +51,20 @@ NEWLINE_ELEMENTS = (
 
 @click.command()
 @click.version_option()
-@click.argument("input", type=click.File("r"), default="-")
-@click.option("selectors", "-s", multiple=True, help="CSS selectors for page areas")
-def cli(input, selectors):
-    "Strip tags from HTML"
+@click.argument("selectors", nargs=-1)
+@click.option("-i", "--input", type=click.File("r"), default="-")
+def cli(selectors, input):
+    """
+    Strip tags from HTML, optionally from areas identified by CSS selectors
+
+    Example usage:
+
+        cat input.html | strip-tags > output.txt
+
+    To run against just specific areas identified by CSS selectors:
+
+        cat input.html | strip-tags .entry .footer > output.txt
+    """
     parser = BeautifulSoup(input, "html5lib")
     if not selectors:
         selectors = ["body"]

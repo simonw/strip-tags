@@ -21,15 +21,15 @@ Pipe content into this tool to strip tags from it:
 
 Or pass a filename:
 
-    strip-tags input.html > output.txt
+    strip-tags -i input.html > output.txt
 
 To run against just specific areas identified by CSS selectors:
 
-    strip-tags -s '.content' input.html > output.txt
+    strip-tags '.content' -i input.html > output.txt
 
 This can be called with multiple selectors:
 
-    strip-tags -s '.content' -s '.sidebar' input.html > output.txt
+    cat input.html | strip-tags '.content' '.sidebar' > output.txt
 
 You can also use:
 

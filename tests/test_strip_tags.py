@@ -14,11 +14,19 @@ import pytest
         ("<div><h1>H1</h1><p>Para</p><pre>pre</pre>", ["h1", "pre"], "H1\npre\n"),
     ),
 )
-def test_strip(input, selectors, expected):
+@pytest.mark.parametrize("use_i_option", (False, True))
+def test_strip(input, selectors, expected, use_i_option):
     runner = CliRunner()
-    args = []
-    for selector in selectors:
-        args.extend(["-s", selector])
-    result = runner.invoke(cli, args, input=input)
+    with runner.isolated_filesystem():
+        args = selectors[:]
+        kwargs = {}
+        if use_i_option:
+            # Create temp file
+            with open("input.html", "w") as fp:
+                fp.write(input)
+                args.extend(["-i", "input.html"])
+        else:
+            kwargs["input"] = input
+        result = runner.invoke(cli, args, **kwargs)
     assert result.exit_code == 0
     assert result.output == expected
