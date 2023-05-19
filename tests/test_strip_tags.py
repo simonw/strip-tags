@@ -31,6 +31,12 @@ import pytest
             [],
             "Hello\n",
         ),
+        # Test alt text replacement
+        (
+            '<img src="foo.jpg" alt="Foo"><img src="bar.jpg" alt="Bar">',
+            [],
+            "FooBar\n",
+        ),
     ),
 )
 @pytest.mark.parametrize("use_i_option", (False, True))

@@ -88,16 +88,23 @@ def cli(selectors, input, minify):
 
         cat input.html | strip-tags .entry .footer > output.txt
     """
-    parser = BeautifulSoup(input, "html5lib")
+    soup = BeautifulSoup(input, "html5lib")
     if not selectors:
         selectors = ["body"]
     output = []
+
     # Remove elements with display: none
     for none_selector in DISPLAY_NONE_SELECTORS:
-        for tag in parser.select(none_selector):
+        for tag in soup.select(none_selector):
             tag.decompose()
+
+    # Replace each image with its alt text
+    for img in soup.select("img[alt]"):
+        img.replace_with(img["alt"])
+
+    # Extract text from selected elements
     for selector in selectors:
-        for tag in parser.select(selector):
+        for tag in soup.select(selector):
             # Output just the text content of this tag
             output.append(tag.text)
             if tag.name in NEWLINE_ELEMENTS:
@@ -105,6 +112,7 @@ def cli(selectors, input, minify):
             # If the tag has a tail, output that too
             if tag.tail:
                 output.append(tag.tail)
+
     final = "".join(output).strip()
     if minify:
         final = minify_whitespace(final)
