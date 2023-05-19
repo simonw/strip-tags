@@ -47,6 +47,29 @@ NEWLINE_ELEMENTS = (
     "li",
 )
 
+DISPLAY_NONE_SELECTORS = [
+    "[hidden]",
+    "area",
+    "base",
+    "basefont",
+    "command",
+    "datalist",
+    "head",
+    "input[type=hidden]",
+    "link",
+    "menu[type=context]",
+    "meta",
+    "noembed",
+    "noframes",
+    "param",
+    "rp",
+    "script",
+    "source",
+    "style",
+    "track",
+    "title",
+]
+
 
 @click.command()
 @click.version_option()
@@ -69,6 +92,10 @@ def cli(selectors, input, minify):
     if not selectors:
         selectors = ["body"]
     output = []
+    # Remove elements with display: none
+    for none_selector in DISPLAY_NONE_SELECTORS:
+        for tag in parser.select(none_selector):
+            tag.decompose()
     for selector in selectors:
         for tag in parser.select(selector):
             # Output just the text content of this tag

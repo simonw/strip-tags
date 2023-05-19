@@ -25,6 +25,12 @@ import pytest
             ["--minify"],
             "Hello this has spaces\n",
         ),
+        # Should remove script and style
+        (
+            "<script>alert('hello');</script><style>body { color: red; }</style>Hello",
+            [],
+            "Hello\n",
+        ),
     ),
 )
 @pytest.mark.parametrize("use_i_option", (False, True))
