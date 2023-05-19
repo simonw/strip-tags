@@ -12,43 +12,48 @@ See [llm, ttok and strip-tags—CLI tools for working with ChatGPT and other LLM
 ## Installation
 
 Install this tool using `pip`:
-
-    pip install strip-tags
-
+```bash
+pip install strip-tags
+```
 ## Usage
 
 Pipe content into this tool to strip tags from it:
-
-    cat input.html | strip-tags > output.txt
-
+```bash
+cat input.html | strip-tags > output.txt
+````
 Or pass a filename:
-
-    strip-tags -i input.html > output.txt
-
+```bash
+strip-tags -i input.html > output.txt
+```
 To run against just specific areas identified by CSS selectors:
-
-    strip-tags '.content' -i input.html > output.txt
-
+```bash
+strip-tags '.content' -i input.html > output.txt
+```
 This can be called with multiple selectors:
-
-    cat input.html | strip-tags '.content' '.sidebar' > output.txt
-
-You can also use:
-
-    python -m strip_tags --help
-
+```bash
+cat input.html | strip-tags '.content' '.sidebar' > output.txt
+```
+To minify whitespace - reducing multiple space and tab characters to a single space, and multiple newlines and spaces to a maximum of two newlines - add `-m` or `--minify`:
+```bash
+cat input.html | strip-tags -m > output.txt
+```
+You can also run this command using `python -m` like this:
+```bash
+python -m strip_tags --help
+```
 ## Development
 
 To contribute to this tool, first checkout the code. Then create a new virtual environment:
-
-    cd strip-tags
-    python -m venv venv
-    source venv/bin/activate
-
+```bash
+cd strip-tags
+python -m venv venv
+source venv/bin/activate
+```
 Now install the dependencies and test dependencies:
-
-    pip install -e '.[test]'
-
+```bash
+pip install -e '.[test]'
+```
 To run the tests:
-
-    pytest
+```bash
+pytest
+```

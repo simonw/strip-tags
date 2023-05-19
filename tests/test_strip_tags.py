@@ -8,10 +8,23 @@ import pytest
     (
         ("<p>Hello <b>world</b></p>", [], "Hello world\n"),
         ("<p>Hello <b>world</b></p>", ["p"], "Hello world\n"),
-        ("<p>Hello <b>world</b></p>", ["b"], "world"),
-        ("<div><span>span</span><b>b</b><i>i</i>", ["span", "i"], "spani"),
+        ("<p>Hello <b>world</b></p>", ["b"], "world\n"),
+        ("<div><span>span</span><b>b</b><i>i</i>", ["span", "i"], "spani\n"),
         # Block level elements should have a newline
         ("<div><h1>H1</h1><p>Para</p><pre>pre</pre>", ["h1", "pre"], "H1\npre\n"),
+        # Various ways whitespace should be stripped
+        ("Hello\nThis\nIs\nNewlines", ["--minify"], "Hello\nThis\nIs\nNewlines\n"),
+        ("Hello\nThis\n\n\nIs\nNewlines", ["-m"], "Hello\nThis\n\nIs\nNewlines\n"),
+        (
+            "Hello\nThis\n\t\t \t\n\nIs\nNewlines",
+            ["--minify"],
+            "Hello\nThis\n\nIs\nNewlines\n",
+        ),
+        (
+            "Hello  this \t has   \t spaces",
+            ["--minify"],
+            "Hello this has spaces\n",
+        ),
     ),
 )
 @pytest.mark.parametrize("use_i_option", (False, True))
