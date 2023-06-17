@@ -67,4 +67,3 @@ def test_strip_cli(input, selectors, expected, use_i_option):
         result = runner.invoke(cli, args, **kwargs)
     assert result.exit_code == 0
     assert result.output == expected
-    assert result.output == expected
