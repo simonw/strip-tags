@@ -1,6 +1,7 @@
-from bs4 import BeautifulSoup
-import click
 import re
+
+import click
+from bs4 import BeautifulSoup
 
 # Elements that should be followed by a newline, derived from
 # https://www.w3.org/TR/2011/WD-html5-20110405/rendering.html#display-types
