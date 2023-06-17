@@ -1,6 +1,7 @@
 import pytest
 from click.testing import CliRunner
 
+from strip_tags import strip_tags
 from strip_tags.cli import cli
 
 TEST_PARAMETERS = (
@@ -67,3 +68,22 @@ def test_strip_cli(input, selectors, expected, use_i_option):
         result = runner.invoke(cli, args, **kwargs)
     assert result.exit_code == 0
     assert result.output == expected
+
+
+@pytest.mark.parametrize("input, selectors, expected", TEST_PARAMETERS)
+def test_strip_lib(input, selectors, expected):
+    # TODO: parameterize minify a different way
+    # list the ways minification gets flagged in selectors
+    minify_flags = set(["-m", "--minify"])
+    # determine if minification is called for
+    minify = any(obj in selectors for obj in minify_flags)
+
+    # remove `minify_flags` from `selectors`
+    selectors = [
+        selector for selector in selectors if selector not in minify_flags
+    ]
+
+    result = strip_tags(selectors, input, minify)
+    # TODO: cli testing requires expected output with `\n` appended
+    # strip `\n` from expected
+    assert result == expected[:-1]
