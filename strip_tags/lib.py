@@ -180,9 +180,6 @@ def process_node(node, minify, keep_tags, all_attrs=False):
         bits = [
             process_node(child, minify, keep_tags, all_attrs) for child in node.contents
         ]
-        # print(bits)
-        # if bits == ['', 'Uses', '', 'Examples', '', 'Plugins', '']:
-        #    breakpoint()
         s = "".join(bits)
         if node.name in keep_tags:
             s = tag_with_attributes(node, s, all_attrs)
