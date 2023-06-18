@@ -73,7 +73,11 @@ DISPLAY_NONE_SELECTORS = [
 
 
 def strip_tags(
-    input: str, selectors: Optional[Iterable[str]] = None, *, minify: bool = False
+    input: str,
+    selectors: Optional[Iterable[str]] = None,
+    *,
+    minify: bool = False,
+    first=False
 ) -> str:
     soup = BeautifulSoup(input, "html5lib")
     if not selectors:
@@ -90,6 +94,7 @@ def strip_tags(
         img.replace_with(img["alt"])
 
     # Extract text from selected elements
+    break_out = False
     for selector in selectors:
         for tag in soup.select(selector):
             # Output just the text content of this tag
@@ -99,6 +104,11 @@ def strip_tags(
             # If the tag has a tail, output that too
             if tag.tail:
                 output.append(tag.tail)
+            if first:
+                break_out = True
+                break
+        if break_out:
+            break
 
     return "".join(output).strip()
 

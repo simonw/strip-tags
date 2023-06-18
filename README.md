@@ -33,6 +33,10 @@ This can be called with multiple selectors:
 ```bash
 cat input.html | strip-tags '.content' '.sidebar' > output.txt
 ```
+To return just the first element on the page that matches one of the selectors, use `--first`:
+```bash
+cat input.html | strip-tags .content --first > output.txt
+```
 To minify whitespace - reducing multiple space and tab characters to a single space, and multiple newlines and spaces to a maximum of two newlines - add `-m` or `--minify`:
 ```bash
 cat input.html | strip-tags -m > output.txt
@@ -47,7 +51,11 @@ You can use `strip-tags` from Python code too. The function signature looks like
 
 ```python
 def strip_tags(
-    input: str, selectors: Optional[Iterable[str]] = None, *, minify: bool = False
+    input: str,
+    selectors: Optional[Iterable[str]] = None,
+    *,
+    minify: bool = False,
+    first=False
 ) -> str:
 ```
 Here's an example:
