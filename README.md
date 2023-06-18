@@ -47,7 +47,7 @@ You can use `strip-tags` from Python code too. The function signature looks like
 
 ```python
 def strip_tags(
-    input: str, selectors: Optional[List[str]] = None, *, minify: bool = False
+    input: str, selectors: Optional[Iterable[str]] = None, *, minify: bool = False
 ) -> str:
 ```
 Here's an example:
