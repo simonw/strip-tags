@@ -55,6 +55,7 @@ This example looks at the `<header>` section of https://datasette.io/ and keeps 
 
 ```
 curl -s https://datasette.io/ | strip-tags header -t h1 -t li
+```
 ```html
 <li>Uses</li>
 <li>Documentation Docs</li>
