@@ -8,7 +8,6 @@ from strip_tags import strip_tags
 @click.argument("selectors", nargs=-1)
 @click.option("-i", "--input", type=click.File("r"), default="-")
 @click.option("-m", "--minify", is_flag=True, help="Minify whitespace")
-# multiple -t
 @click.option("keep_tags", "-t", "--keep-tag", multiple=True, help="Keep these <tags>")
 @click.option("--all-attrs", is_flag=True, help="Include all attributes on kept tags")
 @click.option("--first", is_flag=True, help="First element matching the selectors")
