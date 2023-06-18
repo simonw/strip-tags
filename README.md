@@ -108,8 +108,14 @@ html = """
 </div>
 Ignore this bit.
 """
-stripped = strip_tags(html, ["div"], minify=True)
+stripped = strip_tags(html, ["div"], minify=True, keep_tags=["h1"])
 print(stripped)
+```
+Output:
+```
+<h1>This has tags</h1>
+
+And whitespace too
 ```
 
 ## Development
