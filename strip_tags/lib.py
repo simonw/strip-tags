@@ -1,4 +1,5 @@
 import re
+from typing import List, Optional
 
 from bs4 import BeautifulSoup
 
@@ -71,7 +72,9 @@ DISPLAY_NONE_SELECTORS = [
 ]
 
 
-def strip_tags(selectors, input, minify=False):
+def strip_tags(
+    input: str, selectors: Optional[List[str]] = None, *, minify: bool = False
+) -> str:
     soup = BeautifulSoup(input, "html5lib")
     if not selectors:
         selectors = ["body"]

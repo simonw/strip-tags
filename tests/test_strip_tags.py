@@ -79,11 +79,9 @@ def test_strip_lib(input, selectors, expected):
     minify = any(obj in selectors for obj in minify_flags)
 
     # remove `minify_flags` from `selectors`
-    selectors = [
-        selector for selector in selectors if selector not in minify_flags
-    ]
+    selectors = [selector for selector in selectors if selector not in minify_flags]
 
-    result = strip_tags(selectors, input, minify)
+    result = strip_tags(input, selectors, minify=minify)
     # TODO: cli testing requires expected output with `\n` appended
     # strip `\n` from expected
     assert result == expected[:-1]

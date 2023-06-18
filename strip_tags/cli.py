@@ -20,5 +20,5 @@ def cli(selectors, input, minify):
 
         cat input.html | strip-tags .entry .footer > output.txt
     """
-    final = strip_tags(selectors, input, minify)
+    final = strip_tags(input, selectors, minify=minify)
     click.echo(final)

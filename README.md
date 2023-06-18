@@ -41,6 +41,31 @@ You can also run this command using `python -m` like this:
 ```bash
 python -m strip_tags --help
 ```
+## As a Python library
+
+You can use `strip-tags` from Python code too. The function signature looks like this:
+
+```python
+def strip_tags(
+    input: str, selectors: Optional[List[str]] = None, *, minify: bool = False
+) -> str:
+```
+Here's an example:
+```python
+from strip_tags import strip_tags
+
+html = """
+<div>
+<h1>This has tags</h1>
+
+<p>And whitespace too</p>
+</div>
+Ignore this bit.
+"""
+stripped = strip_tags(html, ["div"], minify=True)
+print(stripped)
+```
+
 ## Development
 
 To contribute to this tool, first checkout the code. Then create a new virtual environment:
