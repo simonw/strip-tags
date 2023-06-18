@@ -1,14 +1,30 @@
-- comment: |
-    Block level elements should have a newline
-  input: |
+- input: |
+    <p>Hello <b>world</b></p>
+  args: []
+  expected: |
+    Hello world
+- input: |
+    <p>Hello <b>world</b></p>
+  args: ["p"]
+  expected: |
+    Hello world
+- input: |
+    <p>Hello <b>world</b></p>
+  args: ["b"]
+  expected: |
+    world
+- input: |
+    <div><span>span</span><b>b</b><i>i</i>
+  args: ["span", "i"]
+  expected: |
+    spani
+- input: |
     <div><h1>H1</h1><p>Para</p><pre>pre</pre>
   args: ["h1", "pre"]
   expected: |
     H1
     pre
-- comment: |
-    Various ways whitespace should be stripped
-  input: |
+- input: |
     Hello
     This
     Is
@@ -22,7 +38,8 @@
 - input: |
     Hello
     This
-    
+
+
     Is
     Newlines
   args: ["-m"]
@@ -35,7 +52,7 @@
 - input: |
     Hello
     This
-    
+    		 	
     
     Is
     Newlines
@@ -47,27 +64,21 @@
     Is
     Newlines
 - input: |
-    Hello  this   has     spaces
+    Hello  this 	 has   	 spaces
   args: ["--minify"]
   expected: |
     Hello this has spaces
-- comment: |
-    Should remove script and style
-  input: |
+- input: |
     <script>alert('hello');</script><style>body { color: red; }</style>Hello
   args: []
   expected: |
     Hello
-- comment: |
-    Test alt text replacement
-  input: |
+- input: |
     <img src="foo.jpg" alt="Foo"><img src="bar.jpg" alt="Bar">
   args: []
   expected: |
     FooBar
-- comment: |
-    Even with --minify <pre> tag content should be unaffected
-  input: |
+- input: |
     <pre>this
       has
         spaces</pre>
@@ -76,16 +87,12 @@
     this
       has
         spaces
-- comment: |
-    Test --first
-  input: |
+- input: |
     Ignore start<p>First paragraph</p><p>Second paragraph</p>Ignore end
   args: ["p", "--first"]
   expected: |
     First paragraph
-- comment: |
-    Keep tags
-  input: |
+- input: |
     Outside of section
     <section>
     Keep these:
@@ -98,3 +105,36 @@
   expected: |
     Keep these:
     <h1>an h1</h1> <h2 class="c" id="i">h2 with class and id</h2> This p will have its tag ignored
+- input: |
+    <h2 class="c" id="i" onclick="f">h2 with class and id</h2><p>Done</p>
+  args: ["-t", "h2", "-m", "--all-attrs"]
+  expected: |
+    <h2 class="c" id="i" onclick="f">h2 with class and id</h2>Done
+- input: |
+    <pre class="foop" onclick="bar">This
+    is    code</pre>
+  args: ["-t", "pre", "-m"]
+  expected: |
+    <pre class="foop">This
+    is    code</pre>
+- input: |
+    Link: <a href="url" class="c" onclick="strip">URL</a>
+    Image: <img alt="ALT">
+    Meta: <meta name="metaname" value="metavalue" blah="blah">
+    <p>No p tag</p>
+  args: ["-t", "a", "-t", "img", "-t", "meta", "--minify"]
+  expected: |
+    Link: <a href="url" class="c">URL</a>
+    Image: <img alt="ALT">
+    Meta: <meta name="metaname" value="metavalue"> No p tag
+- input: |
+    <nav>
+    <ul>
+    <li><a href="/for">Uses</a></li>
+    <li><a href="/examples">Examples</a></li>
+    <li><a href="/plugins">Plugins</a></li>
+    </ul>
+    </nav>
+  args: ["-t", "structure", "-m"]
+  expected: |
+    <nav>  Uses Examples Plugins  </nav>
