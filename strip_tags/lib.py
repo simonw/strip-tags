@@ -71,39 +71,86 @@ DISPLAY_NONE_SELECTORS = [
     "title",
 ]
 
+SELF_CLOSING_TAGS = {
+    "area",
+    "base",
+    "br",
+    "col",
+    "command",
+    "embed",
+    "hr",
+    "img",
+    "input",
+    "keygen",
+    "link",
+    "meta",
+    "param",
+    "source",
+    "track",
+    "wbr",
+}
+
+BUNDLES = {
+    "hs": ("h1", "h2", "h3", "h4", "h5", "h6"),
+    "metadata": ("title", "meta"),
+    "structure": {"header", "nav", "main", "article", "section", "aside", "footer"},
+}
+
+ATTRS_TO_KEEP = {
+    "a": {"href"},
+    "img": {"alt"},
+    "meta": {"name", "value"},
+}
+
 
 def strip_tags(
     input: str,
     selectors: Optional[Iterable[str]] = None,
     *,
     minify: bool = False,
-    first=False
+    first: bool = False,
+    keep_tags: Optional[Iterable[str]] = None,
+    all_attrs: bool = False,
 ) -> str:
-    soup = BeautifulSoup(input, "html5lib")
+    soup = BeautifulSoup(input, "html5lib", multi_valued_attributes=False)
     if not selectors:
         selectors = ["body"]
     output = []
 
+    keep_tags = keep_tags or []
+
+    if keep_tags:
+        # Expand any bundles
+        expanded_keep_tags = []
+        for tag in keep_tags:
+            if tag in BUNDLES:
+                expanded_keep_tags.extend(BUNDLES[tag])
+            else:
+                expanded_keep_tags.append(tag)
+        keep_tags = expanded_keep_tags
+
     # Remove elements with display: none
     for none_selector in DISPLAY_NONE_SELECTORS:
-        for tag in soup.select(none_selector):
-            tag.decompose()
+        if none_selector not in keep_tags:
+            for tag in soup.select(none_selector):
+                tag.decompose()
 
     # Replace each image with its alt text
-    for img in soup.select("img[alt]"):
-        img.replace_with(img["alt"])
+    if "img" not in keep_tags:
+        for img in soup.select("img[alt]"):
+            img.replace_with(img["alt"])
 
     # Extract text from selected elements
     break_out = False
     for selector in selectors:
-        for tag in soup.select(selector):
-            # Output just the text content of this tag
-            output.append(minify_node(tag, minify))
-            if tag.name in NEWLINE_ELEMENTS:
+        for element in soup.select(selector):
+            # Output just the text content of this element
+            output.append(process_node(element, minify, keep_tags, all_attrs))
+            if element.name in NEWLINE_ELEMENTS:
                 output.append("\n")
-            # If the tag has a tail, output that too
-            if tag.tail:
-                output.append(tag.tail)
+            # If the element has a tail, output that too
+            if element.tail:
+                output.append(element.tail)
             if first:
                 break_out = True
                 break
@@ -113,17 +160,30 @@ def strip_tags(
     return "".join(output).strip()
 
 
-def minify_node(node, minify):
+def process_node(node, minify, keep_tags, all_attrs=False):
     # Recursively process a tag or NavigableString
     if isinstance(node, NavigableString):
         if minify:
-            return _whitespace_re.sub(repl, node).strip()
+            minified = _whitespace_re.sub(repl, node)
+            if minified == "\n":
+                minified = " "
+            return minified
         else:
             return node
     elif node.name == "pre":
+        # TODO: Handle 'pre' in keep_tags
         return str(node.text)  # keep <pre> tags as-is
     else:
-        return "".join(minify_node(child, minify) for child in node.contents)
+        bits = [
+            process_node(child, minify, keep_tags, all_attrs) for child in node.contents
+        ]
+        # print(bits)
+        # if bits == ['', 'Uses', '', 'Examples', '', 'Plugins', '']:
+        #    breakpoint()
+        s = "".join(bits)
+        if node.name in keep_tags:
+            s = tag_with_attributes(node, s, all_attrs)
+        return s
 
 
 _whitespace_re = re.compile(r"\s+")
@@ -137,3 +197,17 @@ def repl(m):
         return "\n"
     else:
         return " "
+
+
+def tag_with_attributes(node, content, all_attrs=False):
+    # Returns e.g. <article id="foo" class="bar"> with subset of attributes
+    to_keep = {"id", "class"}
+    to_keep.update(ATTRS_TO_KEEP.get(node.name) or [])
+    bits = [f"<{node.name}"]
+    for key, value in dict(node.attrs).items():
+        if all_attrs or (key in to_keep):
+            bits.append(f'{key}="{value}"')
+    output = " ".join(bits) + ">" + content
+    if node.name not in SELF_CLOSING_TAGS:
+        output += f"</{node.name}>"
+    return output

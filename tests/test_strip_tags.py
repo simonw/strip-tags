@@ -60,6 +60,53 @@ TEST_PARAMETERS = (
         ["p", "--first"],
         "First paragraph",
     ),
+    # Keep tags
+    (
+        """
+        Outside of section
+        <section>
+        Keep these:
+        <h1>an h1</h1>
+        <h2 class="c" id="i" onclick="f">h2 with class and id</h2>
+        <p>This p will have its tag ignored</p>
+        </section>
+        Outside again
+        """,
+        ["section", "-t", "hs", "-m"],
+        'Keep these:\n<h1>an h1</h1> <h2 class="c" id="i">h2 with class and id</h2> This p will have its tag ignored',
+    ),
+    (
+        """
+        <h2 class="c" id="i" onclick="f">h2 with class and id</h2><p>Done</p>
+        """,
+        ["-t", "h2", "-m", "--all-attrs"],
+        '<h2 class="c" id="i" onclick="f">h2 with class and id</h2>Done',
+    ),
+    # Keep a[href] and img[alt] and meta[name][value] even if not asked for
+    (
+        """
+        Link: <a href="url" class="c" onclick="strip">URL</a>
+        Image: <img alt="ALT">
+        Meta: <meta name="metaname" value="metavalue" blah="blah">
+        <p>No p tag</p>
+        """,
+        ["-t", "a", "-t", "img", "-t", "meta", "--minify"],
+        'Link: <a href="url" class="c">URL</a>\nImage: <img alt="ALT">\nMeta: <meta name="metaname" value="metavalue"> No p tag',
+    ),
+    # Avoid squashing things together too much
+    (
+        """
+        <nav>
+        <ul>
+        <li><a href="/for">Uses</a></li>
+        <li><a href="/examples">Examples</a></li>
+        <li><a href="/plugins">Plugins</a></li>
+        </ul>
+        </nav>
+        """,
+        ["-t", "structure", "-m"],
+        "<nav>  Uses Examples Plugins  </nav>",
+    ),
 )
 
 
@@ -89,13 +136,36 @@ def test_strip_lib(input, args, expected):
     selectors = []
     first = False
     minify = False
-    for arg in args:
+    all_attrs = False
+    keep_tags = []
+    args_len = len(args)
+    i = 0
+    while i < args_len:
+        # This is so we can grab the pair of "-t", "x" if needed:
+        arg = args[i]
         if arg in {"-m", "--minify"}:
             minify = True
         elif arg == "--first":
             first = True
+        elif arg == "--all-attrs":
+            all_attrs = True
+        elif arg == "-t":
+            # Skip next token
+            i += 1
+            if i < args_len:
+                keep_tags.append(args[i])
+            else:
+                raise ValueError('Expected an argument after "-t"')
         else:
             selectors.append(arg)
+        i += 1
 
-    result = strip_tags(input, selectors, minify=minify, first=first)
+    result = strip_tags(
+        input,
+        selectors,
+        minify=minify,
+        first=first,
+        keep_tags=keep_tags,
+        all_attrs=all_attrs,
+    )
     assert result == expected

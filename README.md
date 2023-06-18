@@ -45,6 +45,42 @@ You can also run this command using `python -m` like this:
 ```bash
 python -m strip_tags --help
 ```
+### Keeping the markup for specified tags
+
+When passing content to a language model, it can sometimes be useful to leave in a subset of HTML tags - `<h1>This is the heading</h1>` for example - to provide extra hints to the model.
+
+The `-t/--keep-tag` option can be passed multiple times to specify tags that should be kept.
+
+This example looks at the `<header>` section of https://datasette.io/ and keeps the tags around the list items and `<h1>` elements:
+
+```
+curl -s https://datasette.io/ | strip-tags header -t h1 -t li
+```html
+<li>Uses</li>
+<li>Documentation Docs</li>
+<li>Tutorials</li>
+<li>Examples</li>
+<li>Plugins</li>
+<li>Tools</li>
+<li>News</li>
+<h1>
+    Datasette
+</h1>
+Find stories in data
+```
+All attributes will be removed from the tags, except for the `id=` and `class=` attribute since those may provide further useful hints to the language model.
+
+The `href` attribute on links, the `alt` attribute on images and the `name` and `value` attributes on `meta` tags are kept as well.
+
+You can also specify a bundle of tags. For example, `strip-tags -t hs` will keep the tag markup for all levels of headings.
+
+The following bundles can be used:
+
+- `-t hs`: `<h1>`, `<h2>`, `<h3>`, `<h4>`, `<h5>`, `<h6>`
+- `-t metadata`: `<title>`, `<meta>`
+- `-t structure`: `<header>`, `<section>`, `<main>`, `<aside>`, `<footer>`, `<article>`, `<nav>`
+
+
 ## As a Python library
 
 You can use `strip-tags` from Python code too. The function signature looks like this:
@@ -55,7 +91,9 @@ def strip_tags(
     selectors: Optional[Iterable[str]] = None,
     *,
     minify: bool = False,
-    first=False
+    first: bool = False,
+    keep_tags: Optional[Iterable[str]] = None,
+    all_attrs: bool = False,
 ) -> str:
 ```
 Here's an example:
