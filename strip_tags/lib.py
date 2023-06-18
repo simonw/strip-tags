@@ -1,7 +1,7 @@
 import re
 from typing import Iterable, Optional
 
-from bs4 import BeautifulSoup
+from bs4 import BeautifulSoup, NavigableString
 
 # Elements that should be followed by a newline, derived from
 # https://www.w3.org/TR/2011/WD-html5-20110405/rendering.html#display-types
@@ -93,31 +93,37 @@ def strip_tags(
     for selector in selectors:
         for tag in soup.select(selector):
             # Output just the text content of this tag
-            output.append(tag.text)
+            output.append(minify_node(tag, minify))
             if tag.name in NEWLINE_ELEMENTS:
                 output.append("\n")
             # If the tag has a tail, output that too
             if tag.tail:
                 output.append(tag.tail)
 
-    final = "".join(output).strip()
-    if minify:
-        final = minify_whitespace(final)
+    return "".join(output).strip()
 
-    return final
+
+def minify_node(node, minify):
+    # Recursively process a tag or NavigableString
+    if isinstance(node, NavigableString):
+        if minify:
+            return _whitespace_re.sub(repl, node).strip()
+        else:
+            return node
+    elif node.name == "pre":
+        return str(node.text)  # keep <pre> tags as-is
+    else:
+        return "".join(minify_node(child, minify) for child in node.contents)
 
 
 _whitespace_re = re.compile(r"\s+")
 
 
-def minify_whitespace(text):
-    def repl(m):
-        newline_count = m.group(0).count("\n")
-        if newline_count >= 2:
-            return "\n\n"
-        elif newline_count == 1:
-            return "\n"
-        else:
-            return " "
-
-    return _whitespace_re.sub(repl, text).strip()
+def repl(m):
+    newline_count = m.group(0).count("\n")
+    if newline_count >= 2:
+        return "\n\n"
+    elif newline_count == 1:
+        return "\n"
+    else:
+        return " "

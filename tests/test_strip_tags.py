@@ -48,6 +48,12 @@ TEST_PARAMETERS = (
         [],
         "FooBar\n",
     ),
+    # Even with --minify <pre> tag content should be unaffected
+    (
+        "<pre>this\n  has\n    spaces</pre>",
+        ["--minify"],
+        "this\n  has\n    spaces\n",
+    ),
 )
 
 
