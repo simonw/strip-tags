@@ -32,6 +32,6 @@ setup(
         strip-tags=strip_tags.cli:cli
     """,
     install_requires=["click", "beautifulsoup4", "html5lib"],
-    extras_require={"test": ["pytest"]},
+    extras_require={"test": ["pytest", "pytest-icdiff"]},
     python_requires=">=3.7",
 )
