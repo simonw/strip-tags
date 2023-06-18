@@ -1,0 +1,100 @@
+- comment: |
+    Block level elements should have a newline
+  input: |
+    <div><h1>H1</h1><p>Para</p><pre>pre</pre>
+  args: ["h1", "pre"]
+  expected: |
+    H1
+    pre
+- comment: |
+    Various ways whitespace should be stripped
+  input: |
+    Hello
+    This
+    Is
+    Newlines
+  args: ["--minify"]
+  expected: |
+    Hello
+    This
+    Is
+    Newlines
+- input: |
+    Hello
+    This
+    
+    Is
+    Newlines
+  args: ["-m"]
+  expected: |
+    Hello
+    This
+    
+    Is
+    Newlines
+- input: |
+    Hello
+    This
+    
+    
+    Is
+    Newlines
+  args: ["--minify"]
+  expected: |
+    Hello
+    This
+    
+    Is
+    Newlines
+- input: |
+    Hello  this   has     spaces
+  args: ["--minify"]
+  expected: |
+    Hello this has spaces
+- comment: |
+    Should remove script and style
+  input: |
+    <script>alert('hello');</script><style>body { color: red; }</style>Hello
+  args: []
+  expected: |
+    Hello
+- comment: |
+    Test alt text replacement
+  input: |
+    <img src="foo.jpg" alt="Foo"><img src="bar.jpg" alt="Bar">
+  args: []
+  expected: |
+    FooBar
+- comment: |
+    Even with --minify <pre> tag content should be unaffected
+  input: |
+    <pre>this
+      has
+        spaces</pre>
+  args: ["--minify"]
+  expected: |
+    this
+      has
+        spaces
+- comment: |
+    Test --first
+  input: |
+    Ignore start<p>First paragraph</p><p>Second paragraph</p>Ignore end
+  args: ["p", "--first"]
+  expected: |
+    First paragraph
+- comment: |
+    Keep tags
+  input: |
+    Outside of section
+    <section>
+    Keep these:
+    <h1>an h1</h1>
+    <h2 class="c" id="i" onclick="f">h2 with class and id</h2>
+    <p>This p will have its tag ignored</p>
+    </section>
+    Outside again
+  args: ["section", "-t", "hs", "-m"]
+  expected: |
+    Keep these:
+    <h1>an h1</h1> <h2 class="c" id="i">h2 with class and id</h2> This p will have its tag ignored

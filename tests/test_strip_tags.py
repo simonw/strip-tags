@@ -1,120 +1,15 @@
 import pytest
 from click.testing import CliRunner
-
+import pathlib
 from strip_tags import strip_tags
 from strip_tags.cli import cli
+import yaml
 
-TEST_PARAMETERS = (
-    ("<p>Hello <b>world</b></p>", [], "Hello world"),
-    ("<p>Hello <b>world</b></p>", ["p"], "Hello world"),
-    ("<p>Hello <b>world</b></p>", ["b"], "world"),
-    ("<div><span>span</span><b>b</b><i>i</i>", ["span", "i"], "spani"),
-    # Block level elements should have a newline
-    (
-        "<div><h1>H1</h1><p>Para</p><pre>pre</pre>",
-        ["h1", "pre"],
-        "H1\npre",
-    ),
-    # Various ways whitespace should be stripped
-    (
-        "Hello\nThis\nIs\nNewlines",
-        ["--minify"],
-        "Hello\nThis\nIs\nNewlines",
-    ),
-    (
-        "Hello\nThis\n\n\nIs\nNewlines",
-        ["-m"],
-        "Hello\nThis\n\nIs\nNewlines",
-    ),
-    (
-        "Hello\nThis\n\t\t \t\n\nIs\nNewlines",
-        ["--minify"],
-        "Hello\nThis\n\nIs\nNewlines",
-    ),
-    (
-        "Hello  this \t has   \t spaces",
-        ["--minify"],
-        "Hello this has spaces",
-    ),
-    # Should remove script and style
-    (
-        "<script>alert('hello');</script><style>body { color: red; }</style>Hello",
-        [],
-        "Hello",
-    ),
-    # Test alt text replacement
-    (
-        '<img src="foo.jpg" alt="Foo"><img src="bar.jpg" alt="Bar">',
-        [],
-        "FooBar",
-    ),
-    # Even with --minify <pre> tag content should be unaffected
-    (
-        "<pre>this\n  has\n    spaces</pre>",
-        ["--minify"],
-        "this\n  has\n    spaces",
-    ),
-    # Test --first
-    (
-        "Ignore start<p>First paragraph</p><p>Second paragraph</p>Ignore end",
-        ["p", "--first"],
-        "First paragraph",
-    ),
-    # Keep tags
-    (
-        """
-        Outside of section
-        <section>
-        Keep these:
-        <h1>an h1</h1>
-        <h2 class="c" id="i" onclick="f">h2 with class and id</h2>
-        <p>This p will have its tag ignored</p>
-        </section>
-        Outside again
-        """,
-        ["section", "-t", "hs", "-m"],
-        'Keep these:\n<h1>an h1</h1> <h2 class="c" id="i">h2 with class and id</h2> This p will have its tag ignored',
-    ),
-    (
-        """
-        <h2 class="c" id="i" onclick="f">h2 with class and id</h2><p>Done</p>
-        """,
-        ["-t", "h2", "-m", "--all-attrs"],
-        '<h2 class="c" id="i" onclick="f">h2 with class and id</h2>Done',
-    ),
-    (
-        """
-        <pre class="foop" onclick="bar">This\nis    code</pre>
-        """,
-        ["-t", "pre", "-m"],
-        '<pre class="foop">This\nis    code</pre>',
-    ),
-    # Keep a[href] and img[alt] and meta[name][value] even if not asked for
-    (
-        """
-        Link: <a href="url" class="c" onclick="strip">URL</a>
-        Image: <img alt="ALT">
-        Meta: <meta name="metaname" value="metavalue" blah="blah">
-        <p>No p tag</p>
-        """,
-        ["-t", "a", "-t", "img", "-t", "meta", "--minify"],
-        'Link: <a href="url" class="c">URL</a>\nImage: <img alt="ALT">\nMeta: <meta name="metaname" value="metavalue"> No p tag',
-    ),
-    # Avoid squashing things together too much
-    (
-        """
-        <nav>
-        <ul>
-        <li><a href="/for">Uses</a></li>
-        <li><a href="/examples">Examples</a></li>
-        <li><a href="/plugins">Plugins</a></li>
-        </ul>
-        </nav>
-        """,
-        ["-t", "structure", "-m"],
-        "<nav>  Uses Examples Plugins  </nav>",
-    ),
-)
+# load from tests.yaml
+TEST_PARAMETERS = [
+    (d["input"], d["args"], d["expected"].strip())
+    for d in yaml.safe_load((pathlib.Path(__file__).parent / "tests.yaml").read_text())
+]
 
 
 @pytest.mark.parametrize("input,args,expected", TEST_PARAMETERS)
