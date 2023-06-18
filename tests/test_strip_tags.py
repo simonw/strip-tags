@@ -82,6 +82,13 @@ TEST_PARAMETERS = (
         ["-t", "h2", "-m", "--all-attrs"],
         '<h2 class="c" id="i" onclick="f">h2 with class and id</h2>Done',
     ),
+    (
+        """
+        <pre class="foop" onclick="bar">This\nis    code</pre>
+        """,
+        ["-t", "pre", "-m"],
+        '<pre class="foop">This\nis    code</pre>',
+    ),
     # Keep a[href] and img[alt] and meta[name][value] even if not asked for
     (
         """

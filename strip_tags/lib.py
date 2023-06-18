@@ -171,8 +171,11 @@ def process_node(node, minify, keep_tags, all_attrs=False):
         else:
             return node
     elif node.name == "pre":
-        # TODO: Handle 'pre' in keep_tags
-        return str(node.text)  # keep <pre> tags as-is
+        s = str(node.text)
+        if "pre" in keep_tags:
+            return tag_with_attributes(node, s, all_attrs)
+        else:
+            return s
     else:
         bits = [
             process_node(child, minify, keep_tags, all_attrs) for child in node.contents
