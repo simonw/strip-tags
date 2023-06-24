@@ -121,7 +121,7 @@ def strip_tags(
 
     if keep_tags:
         # Expand any bundles
-        expanded_keep_tags = []
+        expanded_keep_tags: list[str] = []
         for tag in keep_tags:
             if tag in BUNDLES:
                 expanded_keep_tags.extend(BUNDLES[tag])
