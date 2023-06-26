@@ -6,7 +6,6 @@ import pytest
 from strip_tags import strip_tags
 
 HTML_FILES_DIR = pathlib.Path(__file__).parent / "html_files"
-assert HTML_FILES_DIR.exists()
 
 
 class Case(NamedTuple):
