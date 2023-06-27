@@ -26,5 +26,6 @@ jobs:
       run: |
         pytest
     - name: Check if cog needs to run
+      if: matrix.python-version == '3.9'
       run: |
         cog --check README.md
