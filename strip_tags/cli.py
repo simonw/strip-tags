@@ -6,7 +6,7 @@ from strip_tags import strip_tags
 @click.command()
 @click.version_option()
 @click.argument("selectors", nargs=-1)
-@click.option("-i", "--input", type=click.File("r"), default="-")
+@click.option("-i", "--input", type=click.File("r"), default="-", help="Input file")
 @click.option("-m", "--minify", is_flag=True, help="Minify whitespace")
 @click.option("keep_tags", "-t", "--keep-tag", multiple=True, help="Keep these <tags>")
 @click.option("--all-attrs", is_flag=True, help="Include all attributes on kept tags")
