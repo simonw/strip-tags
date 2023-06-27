@@ -77,10 +77,20 @@ You can also specify a bundle of tags. For example, `strip-tags -t hs` will keep
 
 The following bundles can be used:
 
+<!-- [[[cog
+import cog
+from strip_tags.lib import BUNDLES
+lines = []
+for name, tags in BUNDLES.items():
+    lines.append("- `-t {}`: {}".format(name, ", ".join("`<{}>`".format(tag) for tag in tags)))
+cog.out("\n".join(lines))
+]]] -->
 - `-t hs`: `<h1>`, `<h2>`, `<h3>`, `<h4>`, `<h5>`, `<h6>`
 - `-t metadata`: `<title>`, `<meta>`
-- `-t structure`: `<header>`, `<section>`, `<main>`, `<aside>`, `<footer>`, `<article>`, `<nav>`
-
+- `-t structure`: `<header>`, `<nav>`, `<main>`, `<article>`, `<section>`, `<aside>`, `<footer>`
+- `-t tables`: `<table>`, `<tr>`, `<td>`, `<th>`, `<thead>`, `<tbody>`, `<tfoot>`, `<caption>`, `<colgroup>`, `<col>`
+- `-t lists`: `<ul>`, `<ol>`, `<li>`, `<dl>`, `<dd>`, `<dt>`
+<!-- [[[end]]] -->
 
 ## As a Python library
 
