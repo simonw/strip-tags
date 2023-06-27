@@ -36,6 +36,7 @@ def test_strip_cli(input, args, expected, use_i_option):
 def test_strip_lib(input, args, expected):
     # Turn args into function arguments
     selectors = []
+    removes = []
     first = False
     minify = False
     all_attrs = False
@@ -58,6 +59,12 @@ def test_strip_lib(input, args, expected):
                 keep_tags.append(args[i])
             else:
                 raise ValueError('Expected an argument after "-t"')
+        elif arg == "-r":
+            i += 1
+            if i < args_len:
+                removes.append(args[i])
+            else:
+                raise ValueError('Expected an argument after "-t"')
         else:
             selectors.append(arg)
         i += 1
@@ -65,6 +72,7 @@ def test_strip_lib(input, args, expected):
     result = strip_tags(
         input,
         selectors,
+        removes=removes,
         minify=minify,
         first=first,
         keep_tags=keep_tags,

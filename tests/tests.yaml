@@ -164,3 +164,17 @@
     <thead><tr><th>One</th><th>Two</th></tr></thead>
     <tbody> <tr><td>1</td><td>2</td></tr> </tbody>
     </table> Done
+- input: |
+    Outside of section
+    <section>
+    Keep these:
+    <h1>an h1</h1>
+    <h2 class="c" id="i" onclick="f">h2 with class and id</h2>
+    <p>This p will have its tag ignored</p>
+    </section>
+    Outside again
+  args: ["-r", "section", "-m"]
+  expected: |
+    Outside of section
+
+    Outside again
