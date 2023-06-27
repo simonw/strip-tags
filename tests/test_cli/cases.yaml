@@ -178,3 +178,19 @@
     Outside of section
 
     Outside again
+- input: |
+    This text has comments
+    <!-- a comment -->
+    And a multi-line comment:
+    <!--
+    This has
+    multiple lines
+    -->
+    Done.
+  args: []
+  expected: |
+    This text has comments
+
+    And a multi-line comment:
+
+    Done.
