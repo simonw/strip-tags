@@ -129,6 +129,44 @@ Output:
 And whitespace too
 ```
 
+## strip-tags --help
+
+<!-- [[[cog
+import cog
+from strip_tags import cli
+from click.testing import CliRunner
+runner = CliRunner()
+result = runner.invoke(cli.cli, ["--help"])
+help = result.output.replace("Usage: cli", "Usage: strip-tags")
+cog.out(
+    "```\n{}\n```".format(help)
+)
+]]] -->
+```
+Usage: strip-tags [OPTIONS] [SELECTORS]...
+
+  Strip tags from HTML, optionally from areas identified by CSS selectors
+
+  Example usage:
+
+      cat input.html | strip-tags > output.txt
+
+  To run against just specific areas identified by CSS selectors:
+
+      cat input.html | strip-tags .entry .footer > output.txt
+
+Options:
+  --version             Show the version and exit.
+  -i, --input FILENAME  Input file
+  -m, --minify          Minify whitespace
+  -t, --keep-tag TEXT   Keep these <tags>
+  --all-attrs           Include all attributes on kept tags
+  --first               First element matching the selectors
+  --help                Show this message and exit.
+
+```
+<!-- [[[end]]] -->
+
 ## Development
 
 To contribute to this tool, first checkout the code. Then create a new virtual environment:
