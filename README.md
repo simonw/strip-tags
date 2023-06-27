@@ -96,17 +96,33 @@ cog.out("\n".join(lines))
 
 You can use `strip-tags` from Python code too. The function signature looks like this:
 
+<!-- [[[cog
+import ast
+module = ast.parse(open("strip_tags/lib.py").read())
+strip_tags = [
+    fn for fn in module.body
+    if getattr(fn, 'name', None) == 'strip_tags'
+][0]
+code = ast.unparse(strip_tags)
+defline = code.split("\n")[0]
+code = (
+    ',\n    '.join(defline.split(', ')).replace(") ->", "\n) ->").replace("strip_tags(", "strip_tags(\n    ")
+)
+cog.out("```python\n{}\n```".format(code))
+]]] -->
 ```python
 def strip_tags(
     input: str,
-    selectors: Optional[Iterable[str]] = None,
+    selectors: Optional[Iterable[str]]=None,
     *,
-    minify: bool = False,
-    first: bool = False,
-    keep_tags: Optional[Iterable[str]] = None,
-    all_attrs: bool = False,
+    minify: bool=False,
+    first: bool=False,
+    keep_tags: Optional[Iterable[str]]=None,
+    all_attrs: bool=False
 ) -> str:
 ```
+<!-- [[[end]]] -->
+
 Here's an example:
 ```python
 from strip_tags import strip_tags
