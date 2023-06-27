@@ -138,3 +138,29 @@
   args: ["-t", "structure", "-m"]
   expected: |
     <nav>  Uses Examples Plugins  </nav>
+- input: |
+    <nav>
+    <ul>
+    <li><a href="/for">Uses</a></li>
+    <li><a href="/examples">Examples</a></li>
+    <li><a href="/plugins">Plugins</a></li>
+    </ul>
+    </nav>
+  args: ["-t", "lists", "-m"]
+  expected: |
+    <ul> <li>Uses</li> <li>Examples</li> <li>Plugins</li> </ul>
+- input: |
+    <h1>Here comes a table</h1>
+    <table>
+    <thead><tr><th>One</th><th>Two</th></tr></thead>
+    <tbody>
+    <tr><td>1</td><td>2</td></tr>
+    </tbody>
+    </table>
+    <p>Done</p>
+  args: ["-t", "tables", "-m"]
+  expected: >
+    Here comes a table <table>
+    <thead><tr><th>One</th><th>Two</th></tr></thead>
+    <tbody> <tr><td>1</td><td>2</td></tr> </tbody>
+    </table> Done
