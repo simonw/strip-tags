@@ -1,7 +1,7 @@
 import re
 from typing import Iterable, Optional
 
-from bs4 import BeautifulSoup, NavigableString
+from bs4 import BeautifulSoup, Comment, NavigableString
 
 # Elements that should be followed by a newline, derived from
 # https://www.w3.org/TR/2011/WD-html5-20110405/rendering.html#display-types
@@ -120,6 +120,7 @@ def strip_tags(
     input: str,
     selectors: Optional[Iterable[str]] = None,
     *,
+    removes: Optional[Iterable[str]] = None,
     minify: bool = False,
     first: bool = False,
     keep_tags: Optional[Iterable[str]] = None,
@@ -129,6 +130,11 @@ def strip_tags(
     if not selectors:
         selectors = ["body"]
     output = []
+
+    if removes:
+        for remove in removes:
+            for tag in soup.select(remove):
+                tag.decompose()
 
     keep_tags = keep_tags or []
 
@@ -175,6 +181,8 @@ def strip_tags(
 
 def process_node(node, minify, keep_tags, all_attrs=False):
     # Recursively process a tag or NavigableString
+    if isinstance(node, Comment):
+        return ""
     if isinstance(node, NavigableString):
         if minify:
             minified = _whitespace_re.sub(repl, node)

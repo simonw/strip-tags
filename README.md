@@ -37,6 +37,10 @@ To return just the first element on the page that matches one of the selectors, 
 ```bash
 cat input.html | strip-tags .content --first > output.txt
 ```
+To remove content contained by specific selectors - e.g. the `<nav>` section of a page, use `-r` or `--remove`:
+```bash
+cat input.html | strip-tags -r nav > output.txt
+```
 To minify whitespace - reducing multiple space and tab characters to a single space, and multiple newlines and spaces to a maximum of two newlines - add `-m` or `--minify`:
 ```bash
 cat input.html | strip-tags -m > output.txt
@@ -115,6 +119,7 @@ def strip_tags(
     input: str,
     selectors: Optional[Iterable[str]]=None,
     *,
+    removes: Optional[Iterable[str]]=None,
     minify: bool=False,
     first: bool=False,
     keep_tags: Optional[Iterable[str]]=None,
@@ -173,6 +178,7 @@ Usage: strip-tags [OPTIONS] [SELECTORS]...
 
 Options:
   --version             Show the version and exit.
+  -r, --remove TEXT     Remove content in these selectors
   -i, --input FILENAME  Input file
   -m, --minify          Minify whitespace
   -t, --keep-tag TEXT   Keep these <tags>
