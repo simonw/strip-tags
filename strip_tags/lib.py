@@ -93,8 +93,8 @@ SELF_CLOSING_TAGS = {
 BUNDLES = {
     "hs": ("h1", "h2", "h3", "h4", "h5", "h6"),
     "metadata": ("title", "meta"),
-    "structure": {"header", "nav", "main", "article", "section", "aside", "footer"},
-    "tables": {
+    "structure": ("header", "nav", "main", "article", "section", "aside", "footer"),
+    "tables": (
         "table",
         "tr",
         "td",
@@ -105,8 +105,8 @@ BUNDLES = {
         "caption",
         "colgroup",
         "col",
-    },
-    "lists": {"ul", "ol", "li", "dl", "dd", "dt"},
+    ),
+    "lists": ("ul", "ol", "li", "dl", "dd", "dt"),
 }
 
 ATTRS_TO_KEEP = {
