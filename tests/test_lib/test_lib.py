@@ -97,6 +97,33 @@ cases = [
         all_attrs=True,
     ),
     Case(
+        id="minify extra tabs and spaces",
+        expected="Hello this has spaces",
+        input="Hello  this 	 has   	 spaces",
+        minify=True,
+    ),
+    Case(
+        id="minify extra newlines",
+        expected="Hello\n\nWorld",
+        input="Hello\n\n\n\n\n\n\nWorld",
+        minify=True,
+    ),
+    Case(
+        id="html comment",
+        expected="",
+        input="<!-- a comment -->",
+    ),
+    Case(
+        id="html comment with text after",
+        expected="Hi!",
+        input="<!-- a comment -->\nHi!",
+    ),
+    Case(
+        id="html multiline comments with text between",
+        expected="Hi!",
+        input="<!-- a\ncomment -->\nHi!\n<!-- a\ncomment -->",
+    ),
+    Case(
         id="lists bundle",
         marks=[pytest.mark.xfail],
         expected="""<ul>
