@@ -79,3 +79,13 @@ def test_strip_lib(input, args, expected):
         all_attrs=all_attrs,
     )
     assert result == expected
+
+
+def test_not_ut8_encoding():
+    runner = CliRunner()
+    with runner.isolated_filesystem():
+        with open("input.html", "wb") as fp:
+            fp.write("<h1>hello</h1>".encode("utf-16"))
+        result = runner.invoke(cli, ["-i", "input.html"])
+    assert result.exit_code == 0
+    assert result.output == "hello\n"
