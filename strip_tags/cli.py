@@ -13,7 +13,7 @@ from strip_tags import strip_tags
     multiple=True,
     help="Remove content in these selectors",
 )
-@click.option("-i", "--input", type=click.File("r"), default="-", help="Input file")
+@click.option("-i", "--input", type=click.File("rb"), default="-", help="Input file")
 @click.option("-m", "--minify", is_flag=True, help="Minify whitespace")
 @click.option("keep_tags", "-t", "--keep-tag", multiple=True, help="Keep these <tags>")
 @click.option("--all-attrs", is_flag=True, help="Include all attributes on kept tags")
