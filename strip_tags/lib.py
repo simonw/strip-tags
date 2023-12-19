@@ -126,7 +126,7 @@ def strip_tags(
     keep_tags: Optional[Iterable[str]] = None,
     all_attrs: bool = False,
 ) -> str:
-    soup = BeautifulSoup(input, "html5lib", multi_valued_attributes=False)
+    soup = BeautifulSoup(input, "html5lib", from_encoding='utf-8', multi_valued_attributes=False)
     if not selectors:
         selectors = ["body"]
     output = []

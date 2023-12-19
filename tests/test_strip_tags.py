@@ -89,3 +89,13 @@ def test_not_ut8_encoding():
         result = runner.invoke(cli, ["-i", "input.html"])
     assert result.exit_code == 0
     assert result.output == "hello\n"
+
+
+def test_utf8_encoding_special_characters():
+    runner = CliRunner()
+    with runner.isolated_filesystem():
+        with open("input.html", "wb") as fp:
+            fp.write("<h1>Ötzi</h1>".encode("utf-8"))
+        result = runner.invoke(cli, ["-i", "input.html"])
+    assert result.exit_code == 0
+    assert result.output == "Ötzi\n"
