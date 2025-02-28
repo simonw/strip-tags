@@ -41,7 +41,7 @@ To remove content contained by specific selectors - e.g. the `<nav>` section of 
 ```bash
 cat input.html | strip-tags -r nav > output.txt
 ```
-To minify whitespace - reducing multiple space and tab characters to a single space, and multiple newlines and spaces to a maximum of two newlines - add `-m` or `--minify`:
+To minify whitespace - reducing multiple space and tab characters to a single space, removing any remaining blank lines - add `-m` or `--minify`:
 ```bash
 cat input.html | strip-tags -m > output.txt
 ```
@@ -121,6 +121,7 @@ def strip_tags(
     *,
     removes: Optional[Iterable[str]]=None,
     minify: bool=False,
+    remove_blank_lines: bool=False,
     first: bool=False,
     keep_tags: Optional[Iterable[str]]=None,
     all_attrs: bool=False
@@ -149,6 +150,7 @@ Output:
 
 And whitespace too
 ```
+Use `remove_blank_lines=True` to remove any remaining blank lines from the output.
 
 ## strip-tags --help
 

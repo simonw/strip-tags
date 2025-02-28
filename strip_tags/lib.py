@@ -122,6 +122,7 @@ def strip_tags(
     *,
     removes: Optional[Iterable[str]] = None,
     minify: bool = False,
+    remove_blank_lines: bool = False,
     first: bool = False,
     keep_tags: Optional[Iterable[str]] = None,
     all_attrs: bool = False,
@@ -130,7 +131,7 @@ def strip_tags(
 
     if not selectors:
         selectors = ["html"]
-    output = []
+    output_bits = []
 
     if removes:
         for remove in removes:
@@ -177,19 +178,22 @@ def strip_tags(
     for selector in selectors:
         for element in soup.select(selector):
             # Output just the text content of this element
-            output.append(process_node(element, minify, keep_tags, all_attrs))
+            output_bits.append(process_node(element, minify, keep_tags, all_attrs))
             if element.name in NEWLINE_ELEMENTS:
-                output.append("\n")
+                output_bits.append("\n")
             # If the element has a tail, output that too
             if element.tail:
-                output.append(element.tail)
+                output_bits.append(element.tail)
             if first:
                 break_out = True
                 break
         if break_out:
             break
 
-    return "".join(output).strip()
+    output = "".join(output_bits).strip()
+    if remove_blank_lines:
+        output = "\n".join(line for line in output.splitlines() if line.strip())
+    return output
 
 
 def process_node(node, minify, keep_tags, all_attrs=False):

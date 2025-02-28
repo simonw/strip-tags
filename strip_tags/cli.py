@@ -35,6 +35,7 @@ def cli(selectors, removes, input, minify, keep_tags, all_attrs, first):
         selectors,
         removes=removes,
         minify=minify,
+        remove_blank_lines=minify,
         first=first,
         keep_tags=keep_tags,
         all_attrs=all_attrs,

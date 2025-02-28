@@ -39,6 +39,7 @@ def test_strip_lib(input, args, expected):
     removes = []
     first = False
     minify = False
+    remove_blank_lines = False
     all_attrs = False
     keep_tags = []
     args_len = len(args)
@@ -48,6 +49,7 @@ def test_strip_lib(input, args, expected):
         arg = args[i]
         if arg in {"-m", "--minify"}:
             minify = True
+            remove_blank_lines = True
         elif arg == "--first":
             first = True
         elif arg == "--all-attrs":
@@ -74,6 +76,7 @@ def test_strip_lib(input, args, expected):
         selectors,
         removes=removes,
         minify=minify,
+        remove_blank_lines=remove_blank_lines,
         first=first,
         keep_tags=keep_tags,
         all_attrs=all_attrs,

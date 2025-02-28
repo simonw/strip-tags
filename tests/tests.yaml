@@ -46,7 +46,6 @@
   expected: |
     Hello
     This
-    
     Is
     Newlines
 - input: |
@@ -60,7 +59,6 @@
   expected: |
     Hello
     This
-    
     Is
     Newlines
 - input: |
@@ -176,7 +174,6 @@
   args: ["-r", "section", "-m"]
   expected: |
     Outside of section
-
     Outside again
 - input: |
     This text has comments
@@ -217,3 +214,42 @@
 
 
     text
+# Without -m:
+- input: |
+    <html>
+
+
+
+    <head><title>This is the title</title></head>
+
+
+    <body>
+         
+    text
+
+         <strong>bold</strong>
+    </body></html>
+  args: []
+  expected: |
+    text
+
+         bold
+# With -m:
+- input: |
+    <html>
+
+
+
+    <head><title>This is the title</title></head>
+
+
+    <body>
+         
+    text
+
+         <strong>bold</strong>
+    </body></html>
+  args: ["-m"]
+  expected: |
+    text
+    bold
