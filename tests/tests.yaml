@@ -194,3 +194,26 @@
     And a multi-line comment:
 
     Done.
+- input: |
+    <html><head><title>This is the title</title></head>
+    <body><p>text</p><h1>Keep</h1></body></html>
+  args: ["-t", "title", "-t", "h1"]
+  expected: |
+    <title>This is the title</title>
+    text<h1>Keep</h1>
+- input: |
+    <html><head><title>This is the title</title>
+    <meta name="content" content="content">
+    <meta name="property" property="prop" />
+    <meta name="value" value="value">
+    <link rel="stylesheet" href="style.css">
+    </head>
+    <body>text</body></html>
+  args: ["-t", "meta"]
+  expected: |
+    <meta name="content" content="content">
+    <meta name="property" property="prop">
+    <meta name="value" value="value">
+
+
+    text

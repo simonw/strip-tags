@@ -112,7 +112,7 @@ BUNDLES = {
 ATTRS_TO_KEEP = {
     "a": {"href"},
     "img": {"alt"},
-    "meta": {"name", "value"},
+    "meta": {"name", "value", "property", "content"},
 }
 
 
@@ -127,8 +127,9 @@ def strip_tags(
     all_attrs: bool = False,
 ) -> str:
     soup = BeautifulSoup(input, "html5lib", multi_valued_attributes=False)
+
     if not selectors:
-        selectors = ["body"]
+        selectors = ["html"]
     output = []
 
     if removes:
@@ -148,11 +149,23 @@ def strip_tags(
                 expanded_keep_tags.append(tag)
         keep_tags = expanded_keep_tags
 
-    # Remove elements with display: none
+    # Define a function to check if an element should be kept
+    def should_keep(element):
+        # Keep if the element's tag name is in keep_tags
+        if element.name in keep_tags:
+            return True
+        # Keep if the element contains any tags in keep_tags
+        for tag_name in keep_tags:
+            if element.find(tag_name):
+                return True
+        return False
+
+    # Remove elements with display: none, but only if they shouldn't be kept
     for none_selector in DISPLAY_NONE_SELECTORS:
-        if none_selector not in keep_tags:
-            for tag in soup.select(none_selector):
-                tag.decompose()
+        for tag in soup.select(none_selector):
+            if should_keep(tag):
+                continue
+            tag.decompose()
 
     # Replace each image with its alt text
     if "img" not in keep_tags:
