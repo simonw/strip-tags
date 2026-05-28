@@ -92,3 +92,27 @@ def test_not_ut8_encoding():
         result = runner.invoke(cli, ["-i", "input.html"])
     assert result.exit_code == 0
     assert result.output == "hello\n"
+
+
+def test_encoding_option_utf8():
+    # UTF-8 bytes with no charset declaration; html5lib would otherwise
+    # mis-detect the encoding and produce garbled output.
+    html = "<p>日本語テスト</p>"
+    runner = CliRunner()
+    with runner.isolated_filesystem():
+        with open("input.html", "wb") as fp:
+            fp.write(html.encode("utf-8"))
+        result = runner.invoke(cli, ["--encoding", "utf-8", "-i", "input.html"])
+    assert result.exit_code == 0
+    assert "日本語テスト" in result.output
+
+
+def test_encoding_option_latin1():
+    html = "<p>café</p>"
+    runner = CliRunner()
+    with runner.isolated_filesystem():
+        with open("input.html", "wb") as fp:
+            fp.write(html.encode("latin-1"))
+        result = runner.invoke(cli, ["--encoding", "latin-1", "-i", "input.html"])
+    assert result.exit_code == 0
+    assert "café" in result.output
