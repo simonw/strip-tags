@@ -18,7 +18,12 @@ from strip_tags import strip_tags
 @click.option("keep_tags", "-t", "--keep-tag", multiple=True, help="Keep these <tags>")
 @click.option("--all-attrs", is_flag=True, help="Include all attributes on kept tags")
 @click.option("--first", is_flag=True, help="First element matching the selectors")
-def cli(selectors, removes, input, minify, keep_tags, all_attrs, first):
+@click.option(
+    "--encoding",
+    default=None,
+    help="Character encoding of input, e.g. utf-8",
+)
+def cli(selectors, removes, input, minify, keep_tags, all_attrs, first, encoding):
     """
     Strip tags from HTML, optionally from areas identified by CSS selectors
 
@@ -30,8 +35,9 @@ def cli(selectors, removes, input, minify, keep_tags, all_attrs, first):
 
         cat input.html | strip-tags .entry .footer > output.txt
     """
+    content = input.read().decode(encoding) if encoding else input
     final = strip_tags(
-        input,
+        content,
         selectors,
         removes=removes,
         minify=minify,
