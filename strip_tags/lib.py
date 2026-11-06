@@ -5,7 +5,7 @@ from bs4 import BeautifulSoup, Comment, NavigableString
 
 # Elements that should be followed by a newline, derived from
 # https://www.w3.org/TR/2011/WD-html5-20110405/rendering.html#display-types
-NEWLINE_ELEMENTS = (
+NEWLINE_ELEMENTS = {
     # display: block; default in the spec
     "address",
     "article",
@@ -46,7 +46,7 @@ NEWLINE_ELEMENTS = (
     "xmp",
     # And <li> too, which default to display: list-item; in the spec:
     "li",
-)
+}
 
 DISPLAY_NONE_SELECTORS = [
     "[hidden]",
@@ -215,9 +215,33 @@ def process_node(node, minify, keep_tags, all_attrs=False):
         else:
             return s
     else:
-        bits = [
-            process_node(child, minify, keep_tags, all_attrs) for child in node.contents
-        ]
+        bits = []
+        for child in node.contents:
+            child_text = process_node(child, minify, keep_tags, all_attrs)
+            # Insert a space before a block-level element when no whitespace
+            # already exists between it and the preceding content.  This
+            # prevents text from adjacent block elements from being run together
+            # (e.g. <div>hello</div><div>world</div> → "hello world" instead of
+            # "helloworld").  The trailing-space side is handled naturally by the
+            # prefix check for the *next* sibling, so we never append a space
+            # unconditionally after an element (which would produce doubled spaces
+            # inside containers like <nav> or <ul>).
+            # In minify mode the caller already handles whitespace collapsing, so
+            # we skip the injection to preserve the existing minified behaviour.
+            if (
+                not minify
+                and child_text
+                and not isinstance(child, NavigableString)
+                and child.name in NEWLINE_ELEMENTS
+                and child.name not in keep_tags
+            ):
+                # `if child_text` above guarantees child_text is non-empty here,
+                # so child_text[-1] is safe.
+                if bits and bits[-1] and not bits[-1][-1].isspace():
+                    bits.append(" ")
+                bits.append(child_text)
+            else:
+                bits.append(child_text)
         s = "".join(bits)
         if node.name in keep_tags:
             s = tag_with_attributes(node, s, all_attrs)

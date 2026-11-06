@@ -253,3 +253,20 @@
   expected: |
     text
     bold
+
+# Tests for issue #35: space between text in adjacent block-level elements
+- input: |
+    <div>hello</div><div>world</div>
+  args: []
+  expected: |
+    hello world
+- input: |
+    <p>First paragraph.</p><p>Second paragraph.</p>
+  args: []
+  expected: |
+    First paragraph. Second paragraph.
+- input: |
+    <div>hello</div> <div>world</div>
+  args: []
+  expected: |
+    hello world
