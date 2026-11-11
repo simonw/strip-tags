@@ -92,3 +92,17 @@ def test_not_ut8_encoding():
         result = runner.invoke(cli, ["-i", "input.html"])
     assert result.exit_code == 0
     assert result.output == "hello\n"
+
+
+def test_invalid_selector_is_clean_error():
+    runner = CliRunner()
+    result = runner.invoke(cli, [":::bad:::"], input="<p>hi</p>")
+    assert result.exit_code == 2
+    assert "Invalid CSS selector" in result.output
+
+
+def test_invalid_remove_selector_is_clean_error():
+    runner = CliRunner()
+    result = runner.invoke(cli, ["-r", ":::bad:::"], input="<p>hi</p>")
+    assert result.exit_code == 2
+    assert "Invalid CSS selector" in result.output

@@ -1,4 +1,5 @@
 import click
+import soupsieve
 
 from strip_tags import strip_tags
 
@@ -30,14 +31,17 @@ def cli(selectors, removes, input, minify, keep_tags, all_attrs, first):
 
         cat input.html | strip-tags .entry .footer > output.txt
     """
-    final = strip_tags(
-        input,
-        selectors,
-        removes=removes,
-        minify=minify,
-        remove_blank_lines=minify,
-        first=first,
-        keep_tags=keep_tags,
-        all_attrs=all_attrs,
-    )
+    try:
+        final = strip_tags(
+            input,
+            selectors,
+            removes=removes,
+            minify=minify,
+            remove_blank_lines=minify,
+            first=first,
+            keep_tags=keep_tags,
+            all_attrs=all_attrs,
+        )
+    except soupsieve.SelectorSyntaxError as ex:
+        raise click.BadParameter("Invalid CSS selector: {}".format(ex))
     click.echo(final)
