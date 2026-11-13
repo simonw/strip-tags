@@ -5,7 +5,7 @@ from bs4 import BeautifulSoup, Comment, NavigableString
 
 # Elements that should be followed by a newline, derived from
 # https://www.w3.org/TR/2011/WD-html5-20110405/rendering.html#display-types
-NEWLINE_ELEMENTS = (
+NEWLINE_ELEMENTS = {
     # display: block; default in the spec
     "address",
     "article",
@@ -46,7 +46,7 @@ NEWLINE_ELEMENTS = (
     "xmp",
     # And <li> too, which default to display: list-item; in the spec:
     "li",
-)
+}
 
 DISPLAY_NONE_SELECTORS = [
     "[hidden]",
@@ -215,9 +215,49 @@ def process_node(node, minify, keep_tags, all_attrs=False):
         else:
             return s
     else:
-        bits = [
-            process_node(child, minify, keep_tags, all_attrs) for child in node.contents
-        ]
+        bits = []
+        last_non_empty_was_block = False
+        last_non_empty_was_kept = False
+
+        for child in node.contents:
+            child_text = process_node(child, minify, keep_tags, all_attrs)
+            if not child_text:
+                continue
+
+            is_block = (
+                not isinstance(child, NavigableString)
+                and child.name in NEWLINE_ELEMENTS
+            )
+            is_kept = (
+                not isinstance(child, NavigableString)
+                and child.name in keep_tags
+            )
+
+            # Insert a space at block-level element boundaries between stripped
+            # content when no whitespace separates them. This prevents adjacent
+            # block elements or block-to-inline text from running together
+            # (e.g. <div>hello</div><div>world</div> → "hello world").
+            # Kept tags are excluded to preserve literal HTML formatting.
+            if bits:
+                last_char = None
+                for b in reversed(bits):
+                    if b:
+                        last_char = b[-1]
+                        break
+
+                if (
+                    last_char
+                    and not last_char.isspace()
+                    and not child_text[0].isspace()
+                    and not last_non_empty_was_kept
+                    and not is_kept
+                    and (last_non_empty_was_block or is_block)
+                ):
+                    bits.append(" ")
+
+            bits.append(child_text)
+            last_non_empty_was_block = is_block
+            last_non_empty_was_kept = is_kept
         s = "".join(bits)
         if node.name in keep_tags:
             s = tag_with_attributes(node, s, all_attrs)
