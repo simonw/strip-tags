@@ -270,3 +270,33 @@
   args: []
   expected: |
     hello world
+- input: |
+    <div>hello</div><div>world</div>
+  args: ["-m"]
+  expected: |
+    hello world
+- input: |
+    <div>hello</div><div></div><div>world</div>
+  args: []
+  expected: |
+    hello world
+- input: |
+    <div>hello</div><!-- comment --><div>world</div>
+  args: []
+  expected: |
+    hello world
+- input: |
+    <div>hello</div><span>world</span>
+  args: []
+  expected: |
+    hello world
+- input: |
+    <div>hello</div>world
+  args: []
+  expected: |
+    hello world
+- input: |
+    <div>hello</div><div> world</div>
+  args: []
+  expected: |
+    hello world

@@ -216,32 +216,48 @@ def process_node(node, minify, keep_tags, all_attrs=False):
             return s
     else:
         bits = []
+        last_non_empty_was_block = False
+        last_non_empty_was_kept = False
+
         for child in node.contents:
             child_text = process_node(child, minify, keep_tags, all_attrs)
-            # Insert a space before a block-level element when no whitespace
-            # already exists between it and the preceding content.  This
-            # prevents text from adjacent block elements from being run together
-            # (e.g. <div>hello</div><div>world</div> → "hello world" instead of
-            # "helloworld").  The trailing-space side is handled naturally by the
-            # prefix check for the *next* sibling, so we never append a space
-            # unconditionally after an element (which would produce doubled spaces
-            # inside containers like <nav> or <ul>).
-            # In minify mode the caller already handles whitespace collapsing, so
-            # we skip the injection to preserve the existing minified behaviour.
-            if (
-                not minify
-                and child_text
-                and not isinstance(child, NavigableString)
+            if not child_text:
+                continue
+
+            is_block = (
+                not isinstance(child, NavigableString)
                 and child.name in NEWLINE_ELEMENTS
-                and child.name not in keep_tags
-            ):
-                # `if child_text` above guarantees child_text is non-empty here,
-                # so child_text[-1] is safe.
-                if bits and bits[-1] and not bits[-1][-1].isspace():
+            )
+            is_kept = (
+                not isinstance(child, NavigableString)
+                and child.name in keep_tags
+            )
+
+            # Insert a space at block-level element boundaries between stripped
+            # content when no whitespace separates them. This prevents adjacent
+            # block elements or block-to-inline text from running together
+            # (e.g. <div>hello</div><div>world</div> → "hello world").
+            # Kept tags are excluded to preserve literal HTML formatting.
+            if bits:
+                last_char = None
+                for b in reversed(bits):
+                    if b:
+                        last_char = b[-1]
+                        break
+
+                if (
+                    last_char
+                    and not last_char.isspace()
+                    and not child_text[0].isspace()
+                    and not last_non_empty_was_kept
+                    and not is_kept
+                    and (last_non_empty_was_block or is_block)
+                ):
                     bits.append(" ")
-                bits.append(child_text)
-            else:
-                bits.append(child_text)
+
+            bits.append(child_text)
+            last_non_empty_was_block = is_block
+            last_non_empty_was_kept = is_kept
         s = "".join(bits)
         if node.name in keep_tags:
             s = tag_with_attributes(node, s, all_attrs)
