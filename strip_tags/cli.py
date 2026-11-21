@@ -1,4 +1,5 @@
 import click
+from bs4.dammit import EncodingDetector
 
 from strip_tags import strip_tags
 
@@ -30,8 +31,15 @@ def cli(selectors, removes, input, minify, keep_tags, all_attrs, first):
 
         cat input.html | strip-tags .entry .footer > output.txt
     """
+    content = input.read()
+    if not EncodingDetector.find_declared_encoding(content, is_html=True):
+        try:
+            content = content.decode("utf-8-sig")
+        except UnicodeDecodeError:
+            # Let the HTML parser handle other encodings.
+            pass
     final = strip_tags(
-        input,
+        content,
         selectors,
         removes=removes,
         minify=minify,
