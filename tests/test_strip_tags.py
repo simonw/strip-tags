@@ -84,11 +84,31 @@ def test_strip_lib(input, args, expected):
     assert result == expected
 
 
-def test_not_ut8_encoding():
+@pytest.mark.parametrize("use_i_option", (False, True))
+@pytest.mark.parametrize(
+    "encoding,charset,text",
+    [
+        ("utf-8", None, "日本語のテキスト"),
+        ("utf-8-sig", None, "日本語のテキスト"),
+        ("utf-16", None, "日本語のテキスト"),
+        ("windows-1252", "windows-1252", "café — résumé"),
+        ("windows-1252", "iso-8859-1", "café — résumé"),
+        ("windows-1252", "windows-1252", "Â£"),
+        ("windows-1252", None, "café — résumé"),
+        ("shift_jis", "shift_jis", "日本語のテキスト"),
+    ],
+)
+def test_cli_encoding(encoding, charset, text, use_i_option):
     runner = CliRunner()
+    html = '<meta charset="{}">'.format(charset) if charset else ""
+    html += "<h1>{}</h1>".format(text)
+    data = html.encode(encoding)
     with runner.isolated_filesystem():
-        with open("input.html", "wb") as fp:
-            fp.write("<h1>hello</h1>".encode("utf-16"))
-        result = runner.invoke(cli, ["-i", "input.html"])
+        if use_i_option:
+            with open("input.html", "wb") as fp:
+                fp.write(data)
+            result = runner.invoke(cli, ["-i", "input.html"])
+        else:
+            result = runner.invoke(cli, [], input=data)
     assert result.exit_code == 0
-    assert result.output == "hello\n"
+    assert result.output == text + "\n"
